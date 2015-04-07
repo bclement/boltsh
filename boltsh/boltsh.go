@@ -135,6 +135,7 @@ func eventLoop(tx *bolt.Tx) error {
 	for {
 		fmt.Print("$ ")
 		line, err := reader.ReadString('\n')
+        line = strings.TrimSpace(line)
 		if err != nil || line == "exit" {
 			/* TODO output error if not EOF */
 			fmt.Println()
