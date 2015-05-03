@@ -1,6 +1,8 @@
 package boltsh
 
 import (
+	"fmt"
+
 	"github.com/boltdb/bolt"
 )
 
@@ -23,6 +25,14 @@ type Level interface {
 	   Get returns a value for a key or nil if none found.
 	*/
 	Get(key string) []byte
+	/*
+	   Put stores a value at the given key.
+	*/
+	Put(key, value string)
+	/*
+		Mkdir creates a new bucket with the given key.
+	*/
+	Mkdir(key string)
 }
 
 type RootLevel struct {
@@ -55,6 +65,17 @@ func (rl *RootLevel) Get(key string) []byte {
 	return nil
 }
 
+func (rl *RootLevel) Put(key, value string) {
+	fmt.Println("Cannot store values at root level")
+}
+
+func (rl *RootLevel) Mkdir(key string) {
+	_, err := rl.tx.CreateBucket([]byte(key))
+	if err != nil {
+		fmt.Printf("Unable to create bucket at key %v: %v\n", key, err)
+	}
+}
+
 type BucketLevel struct {
 	b    *bolt.Bucket
 	prev Level
@@ -80,6 +101,20 @@ func (bl *BucketLevel) List() []string {
 
 func (bl *BucketLevel) Get(key string) []byte {
 	return bl.b.Get([]byte(key))
+}
+
+func (bl *BucketLevel) Put(key, value string) {
+	err := bl.b.Put([]byte(key), []byte(value))
+	if err != nil {
+		fmt.Printf("Unable to store %v at %v: %v\n", value, key, err)
+	}
+}
+
+func (bl *BucketLevel) Mkdir(key string) {
+	_, err := bl.b.CreateBucket([]byte(key))
+	if err != nil {
+		fmt.Printf("Unable to create bucket at key %v: %v\n", key, err)
+	}
 }
 
 /*
