@@ -161,6 +161,24 @@ func mkdir(level boltsh.Level, args []string) boltsh.Level {
 }
 
 /*
+rm expects one arg, a path key.
+The value at the key is removed (deleted).
+*/
+func rm(level boltsh.Level, args []string) boltsh.Level {
+	if len(args) < 2 {
+		fmt.Printf("Rm command must specify key\n")
+	} else {
+		target, key := parseKeyPath(level, args[1])
+		if target == nil {
+			fmt.Printf("Unable to delete value at path %v\n", args[1])
+		} else {
+			target.Rm(key)
+		}
+	}
+	return level
+}
+
+/*
 help prints the available commands.
 */
 func help(level boltsh.Level, args []string) boltsh.Level {
@@ -170,6 +188,7 @@ func help(level boltsh.Level, args []string) boltsh.Level {
 	fmt.Print("\tget [path] - dump bucket entry.\n")
 	fmt.Print("\tmkdir [path] - creates a new bucket.\n")
 	fmt.Print("\tput [path] [json] - add bucket entry.\n")
+	fmt.Print("\trm [path] - remove bucket or value.\n")
 	fmt.Print("\texit - exit program.\n")
 	return level
 }
@@ -184,6 +203,7 @@ var commands = map[string]CommandFunc{
 	"get":   get,
 	"put":   put,
 	"mkdir": mkdir,
+	"rm":    rm,
 }
 
 func main() {

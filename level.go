@@ -33,6 +33,11 @@ type Level interface {
 		Mkdir creates a new bucket with the given key.
 	*/
 	Mkdir(key string)
+
+	/*
+		Rm removes a bucket or value with the given key
+	*/
+	Rm(key string)
 }
 
 type RootLevel struct {
@@ -76,6 +81,13 @@ func (rl *RootLevel) Mkdir(key string) {
 	}
 }
 
+func (rl *RootLevel) Rm(key string) {
+	err := rl.tx.DeleteBucket([]byte(key))
+	if err != nil {
+		fmt.Printf("Unable to delete bucket at key %v: %v\n", key, err)
+	}
+}
+
 type BucketLevel struct {
 	b    *bolt.Bucket
 	prev Level
@@ -114,6 +126,23 @@ func (bl *BucketLevel) Mkdir(key string) {
 	_, err := bl.b.CreateBucket([]byte(key))
 	if err != nil {
 		fmt.Printf("Unable to create bucket at key %v: %v\n", key, err)
+	}
+}
+
+func (bl *BucketLevel) Rm(key string) {
+	keyBytes := []byte(key)
+	c := bl.b.Cursor()
+	k, v := c.Seek(keyBytes)
+	if k != nil && string(k) == key {
+		var err error
+		if v == nil {
+			err = bl.b.DeleteBucket(keyBytes)
+		} else {
+			err = bl.b.Delete(keyBytes)
+		}
+		if err != nil {
+			fmt.Printf("Unable to delete %v: %v\n", key, err)
+		}
 	}
 }
 
