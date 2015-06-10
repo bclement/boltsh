@@ -241,7 +241,7 @@ func argSplit(line string) []string {
 	for i, w := 0, 0; i < len(line); i += w {
 		ch, w = utf8.DecodeRuneInString(line[i:])
 		if state == OUTSIDE {
-			if ch == '"' {
+			if ch == '\'' {
 				state = INQUOTE
 			} else if !unicode.IsSpace(ch) {
 				state = INWORD
@@ -250,11 +250,11 @@ func argSplit(line string) []string {
 		} else if state == INQUOTE {
 			if ch == '\\' {
 				next, width := utf8.DecodeRuneInString(line[i+w:])
-				if next == '"' {
+				if next == '\'' {
 					i, w = i+w, width
-					buff.WriteRune('"')
+					buff.WriteRune('\'')
 				}
-			} else if ch == '"' {
+			} else if ch == '\'' {
 				state = OUTSIDE
 				rval = append(rval, buff.String())
 				buff.Reset()
@@ -262,7 +262,7 @@ func argSplit(line string) []string {
 				buff.WriteRune(ch)
 			}
 		} else if state == INWORD {
-			if ch == '"' {
+			if ch == '\'' {
 				state = INQUOTE
 			} else if unicode.IsSpace(ch) {
 				state = OUTSIDE

@@ -38,14 +38,14 @@ func TestMulti(t *testing.T) {
 }
 
 func TestSingleQuote(t *testing.T) {
-	line := " \"all as one\" "
+	line := " 'all as one' "
 	res := argSplit(line)
 	assertLen(t, 1, res)
 	assertEquals(t, "all as one", res[0])
 }
 
 func TestMixed(t *testing.T) {
-	line := "single \"all as one\" single"
+	line := "single 'all as one' single"
 	res := argSplit(line)
 	assertLen(t, 3, res)
 	assertEquals(t, "single", res[0])
@@ -54,7 +54,7 @@ func TestMixed(t *testing.T) {
 }
 
 func TestMissingSpace(t *testing.T) {
-	line := "where do\"I begin?\""
+	line := "where do'I begin?'"
 	res := argSplit(line)
 	assertLen(t, 2, res)
 	assertEquals(t, "where", res[0])
@@ -62,7 +62,7 @@ func TestMissingSpace(t *testing.T) {
 }
 
 func TestUnterm(t *testing.T) {
-	line := "\"do I end?"
+	line := "'do I end?"
 	res := argSplit(line)
 	assertLen(t, 1, res)
 	assertEquals(t, "do I end?", res[0])
