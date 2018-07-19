@@ -11,7 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/bclement/boltsh/pkg/boltsh"
+	"github.com/bclement/boltsh"
 	"github.com/boltdb/bolt"
 )
 
